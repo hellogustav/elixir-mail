@@ -184,7 +184,7 @@ defmodule Mail do
   defp get_attachment_filename(header) do
     header
     |> Enum.filter(fn {k, _} -> Regex.match?(~r/^filename/, k) end)
-    |> Enum.reduce("", fn {_, v}, acc -> acc <> v end)
+    |> Enum.reduce("", fn {_, v}, acc -> acc <> Mail.Encoder.decode_string(v) end)
   end
 
   defp walk_parts(_parts, {:halt, acc}, _fun), do: {:halt, acc}

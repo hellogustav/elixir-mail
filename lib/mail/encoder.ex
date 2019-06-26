@@ -22,9 +22,27 @@ defmodule Mail.Encoder do
     end
   end
 
+  def encoder_for_string(encoding) when is_binary(encoding) do
+    case encoding |> String.trim do
+      "B" -> Mail.Encoders.Base64
+      "Q" -> Mail.Encoders.QuotedPrintable
+      _ -> Mail.Encoders.Binary
+    end
+  end
+
   @spec encode(data :: binary, encoding :: String.t) :: binary
   def encode(data, encoding), do: encoder_for(encoding).encode(data)
 
   @spec decode(data :: binary, encoding :: String.t) :: binary
   def decode(data, encoding), do: encoder_for(encoding).decode(data)
+
+  @spec decode_string(data :: binary) :: binary
+  def decode_string(data) do
+    ~r/=\?(?<_format>.*)\?(?<encoding>[A-Z])\?(?<string>.*)\?=/
+    |> Regex.named_captures(data)
+    |> case do
+      nil -> data
+      %{"encoding" => encoding, "string" => string} -> encoder_for_string(encoding).decode(string)
+    end
+  end
 end

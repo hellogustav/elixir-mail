@@ -308,10 +308,10 @@ defmodule Mail.Parsers.RFC2822 do
     do: parse_quoted_string(rest, <<acc::binary, char::utf8>>)
 
   defp parse_recipient_value(value) do
-    Regex.scan(~r/\s*"?(.*?)"?\s*?<?([^\s]+@[^\s>]+)>?,?/, String.replace(value, "\"", ""))
+    Regex.scan(~r/\s*"?(.*?)"?\s*?<?([^\s]+@[^\s,>]+)>?,?/, String.replace(value, "\"", ""))
     |> Enum.map(fn
-      [_, "", address] -> String.replace(address, ",", "")
-      [_, name, address] -> {name, String.replace(address, ",", "")}
+      [_, "", address] -> address
+      [_, name, address] -> {name, address}
     end)
   end
 

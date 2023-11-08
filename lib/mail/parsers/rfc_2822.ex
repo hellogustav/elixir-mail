@@ -219,10 +219,13 @@ defmodule Mail.Parsers.RFC2822 do
     do: erl_from_timestamp(timestamp)
 
   defp parse_header_value("message-id", value),
-    do: parse_references_value(value)
-        |> List.first()
+    do:
+      parse_references_value(value)
+      |> List.first()
+
   defp parse_header_value("in-reply-to", value),
     do: parse_references_value(value)
+
   defp parse_header_value("references", value),
     do: parse_references_value(value)
 
@@ -305,7 +308,7 @@ defmodule Mail.Parsers.RFC2822 do
     do: parse_quoted_string(rest, <<acc::binary, char::utf8>>)
 
   defp parse_recipient_value(value) do
-    Regex.scan(~r/\s*"?(.*?)"?\s*?<?([^\s]+@[^\s>]+)>?,?/, String.replace(value, "\"", ""))
+    Regex.scan(~r/\s*"?(.*?)"?\s*?<?([^\s]+@[^\s,>]+)>?,?/, String.replace(value, "\"", ""))
     |> Enum.map(fn
       [_, "", address] -> address
       [_, name, address] -> {name, address}

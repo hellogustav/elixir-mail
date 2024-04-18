@@ -20,7 +20,7 @@ defmodule Mail.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger]]
+    [applications: [:logger, :iconv]]
   end
 
   def package do
@@ -54,7 +54,8 @@ defmodule Mail.Mixfile do
   defp deps do
     [
       {:earmark, "~> 1.3", only: :dev},
-      {:ex_doc, "~> 0.19", only: :dev}
+      {:ex_doc, "~> 0.19", only: :dev},
+      {:iconv, "~> 1.0.10"}
     ]
   end
 end

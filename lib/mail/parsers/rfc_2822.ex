@@ -245,7 +245,7 @@ defmodule Mail.Parsers.RFC2822 do
   defp parse_encoded_word(""), do: ""
 
   defp parse_encoded_word(<<"=?", value::binary>>) do
-    [_charset, encoding, encoded_string, <<"=", remainder::binary>>] =
+    [charset, encoding, encoded_string, <<"=", remainder::binary>>] =
       String.split(value, "?", parts: 4)
 
     decoded_string =
@@ -256,6 +256,8 @@ defmodule Mail.Parsers.RFC2822 do
         "B" ->
           Mail.Encoders.Base64.decode(encoded_string)
       end
+
+    decoded_string = :iconv.convert(charset, "utf8", decoded_string)
 
     decoded_string <> parse_encoded_word(remainder)
   end

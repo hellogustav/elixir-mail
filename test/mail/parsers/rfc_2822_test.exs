@@ -442,6 +442,15 @@ defmodule Mail.Parsers.RFC2822Test do
              part.headers["content-disposition"]
   end
 
+  test "parses headers with custom charset" do
+    message =
+      parse_email("""
+      To: =?iso-8859-1?Q?Us=E9r?= <user@example.com>
+      """)
+
+    assert message.headers["to"] == [{"Usér", "user@example.com"}]
+  end
+
   test "parses structured header with extraneous semicolon" do
     message =
       parse_email("""

@@ -635,6 +635,18 @@ defmodule Mail.Parsers.RFC2822Test do
     assert message.headers["content-type"] == ["text/html", "us-ascii"]
   end
 
+  test "parses content with custom charset to UTF-8" do
+    message =
+      parse_email("""
+      Content-Type: text/plain; charset=WINDOWS-1252
+      Content-Transfer-Encoding: quoted-printable
+
+      Us=E9r
+      """)
+
+    assert message.body == "Usér"
+  end
+
   defp parse_email(email),
     do: email |> convert_crlf |> Mail.Parsers.RFC2822.parse()
 

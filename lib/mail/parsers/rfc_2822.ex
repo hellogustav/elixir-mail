@@ -257,7 +257,7 @@ defmodule Mail.Parsers.RFC2822 do
           Mail.Encoders.Base64.decode(encoded_string)
       end
 
-    decoded_string = :iconv.convert(charset, "utf8", decoded_string)
+    decoded_string = convert(decoded_string, charset)
 
     decoded_string <> parse_encoded_word(remainder)
   end
@@ -456,6 +456,18 @@ defmodule Mail.Parsers.RFC2822 do
   defp decode(body, message) do
     body = String.trim_trailing(body)
     transfer_encoding = Mail.Message.get_header(message, "content-transfer-encoding")
-    Mail.Encoder.decode(body, transfer_encoding)
+    content_type = Mail.Message.get_header(message, "content-type")
+
+    body
+    |> Mail.Encoder.decode(transfer_encoding)
+    |> convert(content_type)
   end
+
+  defp convert(content, [_, {"charset", charset}]), do: convert(content, charset)
+
+  defp convert(content, charset) when is_binary(content) and is_binary(charset) do
+    :iconv.convert(charset, "utf8", content)
+  end
+
+  defp convert(content, _charset), do: content
 end
